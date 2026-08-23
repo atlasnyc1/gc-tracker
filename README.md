@@ -1,6 +1,17 @@
 # GC Tracker
 
-Milestone 1 of the build plan: the smallest possible live version of the app, just to prove the pipes work.
+Milestone 2 of the build plan: sign up, log in, and every account automatically gets its own private company space.
+
+## Setup for Milestone 2 (Supabase)
+
+1. Create a free project at supabase.com.
+2. In your Supabase project, go to Authentication > Providers > Email, and turn OFF "Confirm email" (so sign-ups work instantly without needing an email click, for now).
+3. Go to the SQL Editor, paste in the contents of `supabase/schema.sql`, and click Run.
+4. Go to Settings > API and copy the "Project URL" and the "anon public" key.
+5. In Vercel: Project Settings > Environment Variables, add:
+   - `NEXT_PUBLIC_SUPABASE_URL` = your Project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = your anon public key
+6. Redeploy on Vercel so the new variables take effect.
 
 ## What's in here
 
