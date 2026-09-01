@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createDailyLog } from "./actions";
+import { createDailyLog, createPunchItem, closePunchItem } from "./actions";
 
 export default async function ProjectPage({
   params,
@@ -31,6 +31,12 @@ export default async function ProjectPage({
   const { data: logs } = await supabase
     .from("daily_logs")
     .select("id, notes, weather, crew_count, photo_url, created_at")
+    .eq("project_id", params.id)
+    .order("created_at", { ascending: false });
+
+  const { data: punchItems } = await supabase
+    .from("punch_items")
+    .select("id, description, status, photo_url, created_at, closed_at")
     .eq("project_id", params.id)
     .order("created_at", { ascending: false });
 
@@ -89,7 +95,7 @@ export default async function ProjectPage({
         </form>
       </section>
 
-      <section>
+      <section className="mb-10">
         <h2 className="text-lg font-semibold text-ink mb-3">Log history</h2>
         {!logs || logs.length === 0 ? (
           <p className="text-ink/60 text-sm">No entries yet.</p>
@@ -123,6 +129,109 @@ export default async function ProjectPage({
                       alt="Site photo"
                       className="mt-3 rounded max-h-64 object-cover"
                     />
+                  )}
+                </li>
+              )
+            )}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+        <h2 className="text-lg font-semibold text-ink mb-3">
+          Add a punch item
+        </h2>
+        <form action={createPunchItem} className="flex gap-3">
+          <input type="hidden" name="project_id" value={project.id} />
+          <input
+            type="text"
+            name="description"
+            required
+            placeholder="What needs to be fixed?"
+            className="flex-1 border border-ink/20 rounded px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            className="bg-accent text-white rounded px-4 py-2 text-sm font-medium whitespace-nowrap"
+          >
+            Add item
+          </button>
+        </form>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-semibold text-ink mb-3">Punch list</h2>
+        {!punchItems || punchItems.length === 0 ? (
+          <p className="text-ink/60 text-sm">No punch items yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {punchItems.map(
+              (item: {
+                id: string;
+                description: string;
+                status: string;
+                photo_url: string | null;
+                created_at: string;
+                closed_at: string | null;
+              }) => (
+                <li
+                  key={item.id}
+                  className="bg-white border border-ink/10 rounded p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p
+                      className={
+                        item.status === "closed"
+                          ? "text-ink/50 line-through"
+                          : "text-ink"
+                      }
+                    >
+                      {item.description}
+                    </p>
+                    <span
+                      className={
+                        item.status === "closed"
+                          ? "text-xs font-mono text-green-700 whitespace-nowrap"
+                          : "text-xs font-mono text-accent whitespace-nowrap"
+                      }
+                    >
+                      {item.status === "closed" ? "FIXED" : "OPEN"}
+                    </span>
+                  </div>
+
+                  {item.photo_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.photo_url}
+                      alt="Fix photo"
+                      className="mt-3 rounded max-h-48 object-cover"
+                    />
+                  )}
+
+                  {item.status !== "closed" && (
+                    <form
+                      action={closePunchItem}
+                      className="mt-3 flex items-center gap-3"
+                    >
+                      <input type="hidden" name="project_id" value={project.id} />
+                      <input
+                        type="hidden"
+                        name="punch_item_id"
+                        value={item.id}
+                      />
+                      <input
+                        type="file"
+                        name="photo"
+                        accept="image/*"
+                        className="text-xs flex-1"
+                      />
+                      <button
+                        type="submit"
+                        className="text-xs underline text-ink/60 whitespace-nowrap"
+                      >
+                        Mark fixed
+                      </button>
+                    </form>
                   )}
                 </li>
               )

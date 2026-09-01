@@ -1,10 +1,10 @@
 # GC Tracker
 
-Milestone 4 of the build plan: post a site update with a photo, from a project's page.
+Milestone 5 of the build plan: a punch list you can add to and check off, per project.
 
-## Setup for Milestone 4
+## Setup for Milestone 5
 
-1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-dailylogs.sql`, click Run. This creates the daily_logs table and a storage bucket for photos in one script.
+1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-punchlist.sql`, click Run.
 2. No new environment variables needed.
 
 ## Setup for Milestone 2 (Supabase)

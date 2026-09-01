@@ -52,3 +52,74 @@ export async function createDailyLog(formData: FormData) {
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
+
+export async function createPunchItem(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const projectId = formData.get("project_id")?.toString();
+  const description = formData.get("description")?.toString().trim();
+
+  if (!projectId || !description) return;
+
+  await supabase.from("punch_items").insert({
+    project_id: projectId,
+    description,
+  });
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+export async function closePunchItem(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const projectId = formData.get("project_id")?.toString();
+  const punchItemId = formData.get("punch_item_id")?.toString();
+
+  if (!projectId || !punchItemId) return;
+
+  let photo_url: string | null = null;
+  const photo = formData.get("photo");
+
+  if (photo instanceof File && photo.size > 0) {
+    const fileExt = photo.name.split(".").pop() || "jpg";
+    const filePath = `punch/${projectId}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("daily-log-photos")
+      .upload(filePath, photo);
+
+    if (!uploadError) {
+      const { data: publicUrlData } = supabase.storage
+        .from("daily-log-photos")
+        .getPublicUrl(filePath);
+      photo_url = publicUrlData.publicUrl;
+    }
+  }
+
+  await supabase
+    .from("punch_items")
+    .update({
+      status: "closed",
+      closed_at: new Date().toISOString(),
+      ...(photo_url ? { photo_url } : {}),
+    })
+    .eq("id", punchItemId);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
