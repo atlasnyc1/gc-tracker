@@ -1,6 +1,11 @@
 # GC Tracker
 
-Milestone 2 of the build plan: sign up, log in, and every account automatically gets its own private company space.
+Milestone 3 of the build plan: add a project, see it in a list.
+
+## Setup for Milestone 3
+
+1. In Supabase's SQL Editor, paste in the contents of `supabase/schema-projects.sql` (a new query, separate from the first script) and click Run.
+2. That's it — no new environment variables needed this time.
 
 ## Setup for Milestone 2 (Supabase)
 
