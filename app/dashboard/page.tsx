@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createProject } from "./actions";
@@ -93,21 +94,23 @@ export default async function DashboardPage() {
                 address: string | null;
                 contract_value: number | string | null;
               }) => (
-                <li
-                  key={p.id}
-                  className="bg-white border border-ink/10 rounded p-4 flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium text-ink">{p.name}</p>
-                    {p.address && (
-                      <p className="text-sm text-ink/60">{p.address}</p>
+                <li key={p.id}>
+                  <Link
+                    href={`/dashboard/projects/${p.id}`}
+                    className="bg-white border border-ink/10 rounded p-4 flex items-center justify-between hover:border-accent transition-colors"
+                  >
+                    <div>
+                      <p className="font-medium text-ink">{p.name}</p>
+                      {p.address && (
+                        <p className="text-sm text-ink/60">{p.address}</p>
+                      )}
+                    </div>
+                    {p.contract_value != null && (
+                      <p className="font-mono text-sm text-ink/80">
+                        ${Number(p.contract_value).toLocaleString()}
+                      </p>
                     )}
-                  </div>
-                  {p.contract_value != null && (
-                    <p className="font-mono text-sm text-ink/80">
-                      ${Number(p.contract_value).toLocaleString()}
-                    </p>
-                  )}
+                  </Link>
                 </li>
               )
             )}

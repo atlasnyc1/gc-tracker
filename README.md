@@ -1,11 +1,11 @@
 # GC Tracker
 
-Milestone 3 of the build plan: add a project, see it in a list.
+Milestone 4 of the build plan: post a site update with a photo, from a project's page.
 
-## Setup for Milestone 3
+## Setup for Milestone 4
 
-1. In Supabase's SQL Editor, paste in the contents of `supabase/schema-projects.sql` (a new query, separate from the first script) and click Run.
-2. That's it — no new environment variables needed this time.
+1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-dailylogs.sql`, click Run. This creates the daily_logs table and a storage bucket for photos in one script.
+2. No new environment variables needed.
 
 ## Setup for Milestone 2 (Supabase)
 

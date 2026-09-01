@@ -1,0 +1,54 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+export async function createDailyLog(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const projectId = formData.get("project_id")?.toString();
+  if (!projectId) return;
+
+  const notes = formData.get("notes")?.toString().trim() || null;
+  const weather = formData.get("weather")?.toString().trim() || null;
+  const crewCountRaw = formData.get("crew_count")?.toString().trim();
+  const crew_count = crewCountRaw ? Number(crewCountRaw) : null;
+
+  let photo_url: string | null = null;
+  const photo = formData.get("photo");
+
+  if (photo instanceof File && photo.size > 0) {
+    const fileExt = photo.name.split(".").pop() || "jpg";
+    const filePath = `${projectId}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("daily-log-photos")
+      .upload(filePath, photo);
+
+    if (!uploadError) {
+      const { data: publicUrlData } = supabase.storage
+        .from("daily-log-photos")
+        .getPublicUrl(filePath);
+      photo_url = publicUrlData.publicUrl;
+    }
+  }
+
+  await supabase.from("daily_logs").insert({
+    project_id: projectId,
+    notes,
+    weather,
+    crew_count,
+    photo_url,
+  });
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
