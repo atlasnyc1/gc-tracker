@@ -1,10 +1,10 @@
 # GC Tracker
 
-Milestone 5 of the build plan: a punch list you can add to and check off, per project.
+Milestone 6 of the build plan: budget vs. actual spend, per project.
 
-## Setup for Milestone 5
+## Setup for Milestone 6
 
-1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-punchlist.sql`, click Run.
+1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-budget.sql`, click Run.
 2. No new environment variables needed.
 
 ## Setup for Milestone 2 (Supabase)

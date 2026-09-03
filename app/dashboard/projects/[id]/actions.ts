@@ -123,3 +123,67 @@ export async function closePunchItem(formData: FormData) {
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
+
+export async function createBudgetLine(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const projectId = formData.get("project_id")?.toString();
+  const costCode = formData.get("cost_code")?.toString().trim();
+  const budgetedRaw = formData.get("budgeted")?.toString().trim();
+
+  if (!projectId || !costCode) return;
+
+  const budgeted = budgetedRaw ? Number(budgetedRaw) : 0;
+
+  await supabase.from("budget_lines").insert({
+    project_id: projectId,
+    cost_code: costCode,
+    budgeted,
+  });
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}
+
+export async function logSpend(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const projectId = formData.get("project_id")?.toString();
+  const budgetLineId = formData.get("budget_line_id")?.toString();
+  const amountRaw = formData.get("amount")?.toString().trim();
+
+  if (!projectId || !budgetLineId || !amountRaw) return;
+
+  const amount = Number(amountRaw);
+  if (!amount) return;
+
+  const { data: line } = await supabase
+    .from("budget_lines")
+    .select("actual")
+    .eq("id", budgetLineId)
+    .single();
+
+  const currentActual = (line as { actual?: number } | null)?.actual ?? 0;
+
+  await supabase
+    .from("budget_lines")
+    .update({ actual: Number(currentActual) + amount })
+    .eq("id", budgetLineId);
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+}

@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createDailyLog, createPunchItem, closePunchItem } from "./actions";
+import {
+  createDailyLog,
+  createPunchItem,
+  closePunchItem,
+  createBudgetLine,
+  logSpend,
+} from "./actions";
 
 export default async function ProjectPage({
   params,
@@ -39,6 +45,21 @@ export default async function ProjectPage({
     .select("id, description, status, photo_url, created_at, closed_at")
     .eq("project_id", params.id)
     .order("created_at", { ascending: false });
+
+  const { data: budgetLines } = await supabase
+    .from("budget_lines")
+    .select("id, cost_code, budgeted, actual")
+    .eq("project_id", params.id)
+    .order("created_at", { ascending: true });
+
+  const totalBudgeted = (budgetLines ?? []).reduce(
+    (sum: number, l: { budgeted: number }) => sum + Number(l.budgeted),
+    0
+  );
+  const totalActual = (budgetLines ?? []).reduce(
+    (sum: number, l: { actual: number }) => sum + Number(l.actual),
+    0
+  );
 
   return (
     <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
@@ -233,6 +254,124 @@ export default async function ProjectPage({
                       </button>
                     </form>
                   )}
+                </li>
+              )
+            )}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-lg font-semibold text-ink mb-3">Budget</h2>
+
+        <div className="bg-white border border-ink/10 rounded p-4 mb-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-ink/50 uppercase tracking-wide">
+              Budgeted
+            </p>
+            <p className="font-mono text-ink">
+              ${totalBudgeted.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-ink/50 uppercase tracking-wide">
+              Spent
+            </p>
+            <p className="font-mono text-ink">
+              ${totalActual.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-ink/50 uppercase tracking-wide">
+              Remaining
+            </p>
+            <p
+              className={
+                totalBudgeted - totalActual < 0
+                  ? "font-mono text-red-600"
+                  : "font-mono text-ink"
+              }
+            >
+              ${(totalBudgeted - totalActual).toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-ink/10 rounded p-5 mb-4">
+          <h3 className="text-sm font-semibold text-ink mb-3">
+            Add a budget line
+          </h3>
+          <form action={createBudgetLine} className="flex gap-3">
+            <input type="hidden" name="project_id" value={project.id} />
+            <input
+              type="text"
+              name="cost_code"
+              required
+              placeholder="Cost code (e.g. Framing)"
+              className="flex-1 border border-ink/20 rounded px-3 py-2 text-sm"
+            />
+            <input
+              type="number"
+              name="budgeted"
+              step="0.01"
+              placeholder="Budgeted $"
+              className="w-32 border border-ink/20 rounded px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              className="bg-accent text-white rounded px-4 py-2 text-sm font-medium whitespace-nowrap"
+            >
+              Add line
+            </button>
+          </form>
+        </div>
+
+        {!budgetLines || budgetLines.length === 0 ? (
+          <p className="text-ink/60 text-sm">No budget lines yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {budgetLines.map(
+              (line: {
+                id: string;
+                cost_code: string;
+                budgeted: number;
+                actual: number;
+              }) => (
+                <li
+                  key={line.id}
+                  className="bg-white border border-ink/10 rounded p-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium text-ink">{line.cost_code}</p>
+                    <p className="text-sm font-mono text-ink/70">
+                      ${Number(line.actual).toLocaleString()} / $
+                      {Number(line.budgeted).toLocaleString()}
+                    </p>
+                  </div>
+                  <form
+                    action={logSpend}
+                    className="flex items-center gap-2"
+                  >
+                    <input type="hidden" name="project_id" value={project.id} />
+                    <input
+                      type="hidden"
+                      name="budget_line_id"
+                      value={line.id}
+                    />
+                    <input
+                      type="number"
+                      name="amount"
+                      step="0.01"
+                      placeholder="Log spend $"
+                      className="w-32 border border-ink/20 rounded px-2 py-1 text-xs"
+                    />
+                    <button
+                      type="submit"
+                      className="text-xs underline text-ink/60 whitespace-nowrap"
+                    >
+                      Add spend
+                    </button>
+                  </form>
                 </li>
               )
             )}
