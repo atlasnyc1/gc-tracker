@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -33,6 +34,10 @@ export default async function ProjectPage({
   if (!project) {
     notFound();
   }
+
+  const host = (await headers()).get("host");
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const portalUrl = `${protocol}://${host}/portal/${project.id}`;
 
   const { data: logs } = await supabase
     .from("daily_logs")
@@ -72,8 +77,19 @@ export default async function ProjectPage({
 
       <h1 className="text-2xl font-bold text-ink mb-1">{project.name}</h1>
       {project.address && (
-        <p className="text-ink/60 mb-8">{project.address}</p>
+        <p className="text-ink/60 mb-6">{project.address}</p>
       )}
+
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+        <h2 className="text-lg font-semibold text-ink mb-2">Client link</h2>
+        <p className="text-sm text-ink/60 mb-3">
+          Share this with your client — no login needed, read-only, and it
+          only shows this one project.
+        </p>
+        <code className="block bg-ink/5 rounded p-3 text-xs break-all text-ink/80">
+          {portalUrl}
+        </code>
+      </section>
 
       <section className="mb-10 bg-white border border-ink/10 rounded p-5">
         <h2 className="text-lg font-semibold text-ink mb-3">
