@@ -1,14 +1,15 @@
 # GC Tracker
 
-Milestone 7 of the build plan: a read-only client link, no login needed.
+Milestone 8 of the build plan: charge a monthly subscription via Stripe.
 
-## Setup for Milestone 7
+## Setup for Milestone 8
 
-No SQL script this time. Instead, one new environment variable:
-
-1. In Supabase: Settings > API Keys, copy the key labeled **secret** (not publishable/anon this time).
-2. In Vercel: Settings > Environment Variables > Add, Key: `SUPABASE_SECRET_KEY`, Value: that secret key. Save.
-3. This key is powerful — it's what lets the client's link show project info without them logging in. It stays server-only and is never sent to anyone's browser.
+1. In Supabase's SQL Editor, new snippet, paste in the contents of `supabase/schema-billing.sql`, click Run.
+2. In Stripe: create a Product with a recurring monthly Price. Copy its Price ID (starts with `price_...`).
+3. In Stripe: Developers > API keys, copy the Secret key (starts with `sk_...`).
+4. In Stripe: Developers > Webhooks, add an endpoint pointing to `https://your-site.vercel.app/api/stripe/webhook`, listening for `checkout.session.completed`, `customer.subscription.updated`, and `customer.subscription.deleted`. Copy its Signing secret (starts with `whsec_...`).
+5. In Vercel, add three environment variables: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`.
+6. Push the code, redeploy, then test with Stripe's test card number 4242 4242 4242 4242, any future expiry date, any CVC.
 
 ## Setup for Milestone 2 (Supabase)
 

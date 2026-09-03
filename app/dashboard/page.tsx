@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createProject } from "./actions";
+import { createProject, startCheckout, openBillingPortal } from "./actions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -16,13 +16,19 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("company_id, companies(name)")
+    .select("company_id, companies(name, subscription_status)")
     .eq("id", user.id)
     .single();
 
-  const companyName =
-    (profile as { companies?: { name?: string } | null } | null)?.companies
-      ?.name ?? "your company";
+  const company = (
+    profile as {
+      companies?: { name?: string; subscription_status?: string } | null;
+    } | null
+  )?.companies;
+
+  const companyName = company?.name ?? "your company";
+  const subscriptionStatus = company?.subscription_status ?? "trialing";
+  const isActive = subscriptionStatus === "active";
 
   const companyId =
     (profile as { company_id?: string } | null)?.company_id ?? "";
@@ -35,16 +41,36 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 gap-4">
         <div>
           <span className="font-mono text-xs tracking-widest uppercase text-accent block mb-1">
-            Milestone 3 — Projects
+            Milestone 8 — Payments
           </span>
           <h1 className="text-2xl font-bold text-ink">{companyName}</h1>
         </div>
-        <form action="/auth/signout" method="post">
-          <button className="text-sm underline text-ink/60">Sign out</button>
-        </form>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <span
+              className={
+                isActive
+                  ? "block text-xs font-mono text-green-700"
+                  : "block text-xs font-mono text-accent"
+              }
+            >
+              {isActive ? "ACTIVE" : "TRIALING"}
+            </span>
+            <form action={isActive ? openBillingPortal : startCheckout}>
+              <button className="text-sm underline text-ink/60">
+                {isActive ? "Manage billing" : "Subscribe"}
+              </button>
+            </form>
+          </div>
+          <form action="/auth/signout" method="post">
+            <button className="text-sm underline text-ink/60">
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
 
       <section className="mb-10 bg-white border border-ink/10 rounded p-5">
