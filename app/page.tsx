@@ -3,15 +3,16 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-      <span className="font-mono text-xs tracking-widest uppercase text-accent mb-4">
-        Milestone 2 — Sign Up &amp; Log In
-      </span>
       <h1 className="text-4xl sm:text-5xl font-bold text-ink mb-3">
         GC Tracker
       </h1>
-      <p className="text-ink/70 max-w-md mb-6">
-        The job tracker built for how small GCs actually work. Daily logs
-        and budgets are coming next.
+      <p className="text-ink/70 max-w-md mb-2">
+        The simple job tracker built for how small GCs actually work.
+      </p>
+      <p className="text-ink/60 max-w-md text-sm mb-6">
+        Daily logs with photos, a punch list, budget tracking, and a link
+        you can send clients so they can check progress themselves — all
+        in one place, nothing extra to learn.
       </p>
       <Link
         href="/login"
