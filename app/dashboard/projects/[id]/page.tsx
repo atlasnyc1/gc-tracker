@@ -70,17 +70,17 @@ export default async function ProjectPage({
     <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
       <Link
         href="/dashboard"
-        className="text-sm text-accent underline mb-6 inline-block"
+        className="text-base text-sky-300 underline mb-6 inline-block"
       >
         ← Back to projects
       </Link>
 
-      <h1 className="text-2xl font-bold text-ink mb-1">{project.name}</h1>
+      <h1 className="text-2xl font-bold text-white mb-1">{project.name}</h1>
       {project.address && (
-        <p className="text-ink/60 mb-6">{project.address}</p>
+        <p className="text-white/70 mb-6">{project.address}</p>
       )}
 
-      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5 shadow-lg">
         <h2 className="text-lg font-semibold text-ink mb-2">Client link</h2>
         <p className="text-sm text-ink/60 mb-3">
           Share this with your client — no login needed, read-only, and it
@@ -91,7 +91,7 @@ export default async function ProjectPage({
         </code>
       </section>
 
-      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5 shadow-lg">
         <h2 className="text-lg font-semibold text-ink mb-3">
           Add a daily log
         </h2>
@@ -125,7 +125,7 @@ export default async function ProjectPage({
           />
           <button
             type="submit"
-            className="bg-accent text-white rounded px-4 py-2 text-sm font-medium"
+            className="bg-accent text-white rounded px-5 py-3 text-base font-medium"
           >
             Add log
           </button>
@@ -133,9 +133,9 @@ export default async function ProjectPage({
       </section>
 
       <section className="mb-10">
-        <h2 className="text-lg font-semibold text-ink mb-3">Log history</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">Log history</h2>
         {!logs || logs.length === 0 ? (
-          <p className="text-ink/60 text-sm">No entries yet.</p>
+          <p className="text-white/70 text-sm">No entries yet.</p>
         ) : (
           <ul className="space-y-4">
             {logs.map(
@@ -149,7 +149,7 @@ export default async function ProjectPage({
               }) => (
                 <li
                   key={log.id}
-                  className="bg-white border border-ink/10 rounded p-4"
+                  className="bg-white border border-ink/10 rounded p-4 shadow-lg"
                 >
                   <p className="text-xs text-ink/50 mb-2">
                     {new Date(log.created_at).toLocaleString()}
@@ -174,7 +174,7 @@ export default async function ProjectPage({
         )}
       </section>
 
-      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5 shadow-lg">
         <h2 className="text-lg font-semibold text-ink mb-3">
           Add a punch item
         </h2>
@@ -189,7 +189,7 @@ export default async function ProjectPage({
           />
           <button
             type="submit"
-            className="bg-accent text-white rounded px-4 py-2 text-sm font-medium whitespace-nowrap"
+            className="bg-accent text-white rounded px-5 py-3 text-base font-medium whitespace-nowrap"
           >
             Add item
           </button>
@@ -197,9 +197,9 @@ export default async function ProjectPage({
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-ink mb-3">Punch list</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">Punch list</h2>
         {!punchItems || punchItems.length === 0 ? (
-          <p className="text-ink/60 text-sm">No punch items yet.</p>
+          <p className="text-white/70 text-sm">No punch items yet.</p>
         ) : (
           <ul className="space-y-3">
             {punchItems.map(
@@ -213,7 +213,7 @@ export default async function ProjectPage({
               }) => (
                 <li
                   key={item.id}
-                  className="bg-white border border-ink/10 rounded p-4"
+                  className="bg-white border border-ink/10 rounded p-4 shadow-lg"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p
@@ -260,11 +260,11 @@ export default async function ProjectPage({
                         type="file"
                         name="photo"
                         accept="image/*"
-                        className="text-xs flex-1"
+                        className="text-sm flex-1"
                       />
                       <button
                         type="submit"
-                        className="text-xs underline text-ink/60 whitespace-nowrap"
+                        className="text-sm underline text-ink/60 whitespace-nowrap"
                       >
                         Mark fixed
                       </button>
@@ -278,9 +278,9 @@ export default async function ProjectPage({
       </section>
 
       <section className="mb-10">
-        <h2 className="text-lg font-semibold text-ink mb-3">Budget</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">Budget</h2>
 
-        <div className="bg-white border border-ink/10 rounded p-4 mb-4 flex items-center justify-between">
+        <div className="bg-white border border-ink/10 rounded p-4 mb-4 flex items-center justify-between shadow-lg">
           <div>
             <p className="text-xs text-ink/50 uppercase tracking-wide">
               Budgeted
@@ -313,7 +313,7 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        <div className="bg-white border border-ink/10 rounded p-5 mb-4">
+        <div className="bg-white border border-ink/10 rounded p-5 mb-4 shadow-lg">
           <h3 className="text-sm font-semibold text-ink mb-3">
             Add a budget line
           </h3>
@@ -335,7 +335,7 @@ export default async function ProjectPage({
             />
             <button
               type="submit"
-              className="bg-accent text-white rounded px-4 py-2 text-sm font-medium whitespace-nowrap"
+              className="bg-accent text-white rounded px-5 py-3 text-base font-medium whitespace-nowrap"
             >
               Add line
             </button>
@@ -343,7 +343,7 @@ export default async function ProjectPage({
         </div>
 
         {!budgetLines || budgetLines.length === 0 ? (
-          <p className="text-ink/60 text-sm">No budget lines yet.</p>
+          <p className="text-white/70 text-sm">No budget lines yet.</p>
         ) : (
           <ul className="space-y-2">
             {budgetLines.map(
@@ -355,7 +355,7 @@ export default async function ProjectPage({
               }) => (
                 <li
                   key={line.id}
-                  className="bg-white border border-ink/10 rounded p-4"
+                  className="bg-white border border-ink/10 rounded p-4 shadow-lg"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <p className="font-medium text-ink">{line.cost_code}</p>
@@ -379,11 +379,11 @@ export default async function ProjectPage({
                       name="amount"
                       step="0.01"
                       placeholder="Log spend $"
-                      className="w-32 border border-ink/20 rounded px-2 py-1 text-xs"
+                      className="w-32 border border-ink/20 rounded px-2 py-1.5 text-sm"
                     />
                     <button
                       type="submit"
-                      className="text-xs underline text-ink/60 whitespace-nowrap"
+                      className="text-sm underline text-ink/60 whitespace-nowrap"
                     >
                       Add spend
                     </button>

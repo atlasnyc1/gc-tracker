@@ -42,38 +42,33 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-8 gap-4">
-        <div>
-          <span className="font-mono text-xs tracking-widest uppercase text-accent block mb-1">
-            Milestone 8 — Payments
-          </span>
-          <h1 className="text-2xl font-bold text-ink">{companyName}</h1>
-        </div>
+        <h1 className="text-2xl font-bold text-white">{companyName}</h1>
         <div className="flex items-center gap-4">
           <div className="text-right">
             <span
               className={
                 isActive
-                  ? "block text-xs font-mono text-green-700"
-                  : "block text-xs font-mono text-accent"
+                  ? "block text-xs font-mono text-emerald-400"
+                  : "block text-xs font-mono text-sky-300"
               }
             >
               {isActive ? "ACTIVE" : "TRIALING"}
             </span>
             <form action={isActive ? openBillingPortal : startCheckout}>
-              <button className="text-sm underline text-ink/60">
+              <button className="text-base underline text-white/70">
                 {isActive ? "Manage billing" : "Subscribe"}
               </button>
             </form>
           </div>
           <form action="/auth/signout" method="post">
-            <button className="text-sm underline text-ink/60">
+            <button className="text-base underline text-white/70">
               Sign out
             </button>
           </form>
         </div>
       </div>
 
-      <section className="mb-10 bg-white border border-ink/10 rounded p-5">
+      <section className="mb-10 bg-white border border-ink/10 rounded p-5 shadow-lg">
         <h2 className="text-lg font-semibold text-ink mb-3">Add a project</h2>
         <form action={createProject} className="space-y-3">
           <input
@@ -98,7 +93,7 @@ export default async function DashboardPage() {
           />
           <button
             type="submit"
-            className="bg-accent text-white rounded px-4 py-2 text-sm font-medium"
+            className="bg-accent text-white rounded px-5 py-3 text-base font-medium"
           >
             Add project
           </button>
@@ -106,9 +101,11 @@ export default async function DashboardPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-ink mb-3">Your projects</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">
+          Your projects
+        </h2>
         {!projects || projects.length === 0 ? (
-          <p className="text-ink/60 text-sm">
+          <p className="text-white/70 text-sm">
             No projects yet — add your first one above.
           </p>
         ) : (
@@ -123,7 +120,7 @@ export default async function DashboardPage() {
                 <li key={p.id}>
                   <Link
                     href={`/dashboard/projects/${p.id}`}
-                    className="bg-white border border-ink/10 rounded p-4 flex items-center justify-between hover:border-accent transition-colors"
+                    className="bg-white border border-ink/10 rounded p-4 flex items-center justify-between hover:border-accent transition-colors shadow-lg"
                   >
                     <div>
                       <p className="font-medium text-ink">{p.name}</p>

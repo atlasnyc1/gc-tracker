@@ -4,5 +4,10 @@
 
 body {
   color: #1a2b38;
-  background: #f3f5f6;
+  background-color: #0b2e52;
+  background-image: url("/blueprint-bg.svg");
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }

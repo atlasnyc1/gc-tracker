@@ -53,15 +53,15 @@ export default async function ClientPortalPage({
 
   return (
     <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
-      <span className="font-mono text-xs tracking-widest uppercase text-accent block mb-2">
+      <span className="font-mono text-xs tracking-widest uppercase text-sky-300 block mb-2">
         Project Status
       </span>
-      <h1 className="text-3xl font-bold text-ink mb-1">{project.name}</h1>
+      <h1 className="text-3xl font-bold text-white mb-1">{project.name}</h1>
       {project.address && (
-        <p className="text-ink/60 mb-8">{project.address}</p>
+        <p className="text-white/70 mb-8">{project.address}</p>
       )}
 
-      <section className="bg-white border border-ink/10 rounded p-5 mb-6">
+      <section className="bg-white border border-ink/10 rounded p-5 mb-6 shadow-lg">
         <h2 className="text-sm font-semibold text-ink/70 uppercase tracking-wide mb-3">
           Budget
         </h2>
@@ -81,7 +81,7 @@ export default async function ClientPortalPage({
         </div>
       </section>
 
-      <section className="bg-white border border-ink/10 rounded p-5 mb-6">
+      <section className="bg-white border border-ink/10 rounded p-5 mb-6 shadow-lg">
         <h2 className="text-sm font-semibold text-ink/70 uppercase tracking-wide mb-3">
           Punch List
         </h2>
@@ -91,11 +91,11 @@ export default async function ClientPortalPage({
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-ink/70 uppercase tracking-wide mb-3">
+        <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wide mb-3">
           Recent Updates
         </h2>
         {!logs || logs.length === 0 ? (
-          <p className="text-ink/60 text-sm">No updates yet.</p>
+          <p className="text-white/70 text-sm">No updates yet.</p>
         ) : (
           <ul className="space-y-4">
             {logs.map(
@@ -107,7 +107,7 @@ export default async function ClientPortalPage({
               }) => (
                 <li
                   key={log.id}
-                  className="bg-white border border-ink/10 rounded p-4"
+                  className="bg-white border border-ink/10 rounded p-4 shadow-lg"
                 >
                   <p className="text-xs text-ink/50 mb-2">
                     {new Date(log.created_at).toLocaleDateString()}

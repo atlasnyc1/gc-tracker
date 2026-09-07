@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-2xl font-bold text-ink mb-1 text-center">
           {mode === "signup" ? "Create your account" : "Welcome back"}
         </h1>
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-accent text-white rounded px-3 py-2 text-sm font-medium disabled:opacity-50"
+            className="w-full bg-accent text-white rounded px-3 py-3 text-base font-medium disabled:opacity-50"
           >
             {loading ? "Please wait…" : mode === "signup" ? "Sign up" : "Sign in"}
           </button>
@@ -79,7 +79,7 @@ export default function LoginPage() {
 
         <button
           onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-          className="w-full text-center text-sm text-ink/60 mt-4 underline"
+          className="w-full text-center text-base text-ink/60 mt-4 underline"
         >
           {mode === "signup"
             ? "Already have an account? Sign in"
