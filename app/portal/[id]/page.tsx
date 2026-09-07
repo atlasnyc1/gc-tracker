@@ -5,6 +5,8 @@ import { createServiceClient } from "@/lib/supabase/service";
 // sees the latest budget, punch list, and daily logs instead of a cached
 // snapshot from an earlier visit.
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 export default async function ClientPortalPage({
   params,
@@ -13,7 +15,7 @@ export default async function ClientPortalPage({
 }) {
   const supabase = createServiceClient();
 
-  const { data: project } = await supabase
+  const { data: project, error: projectError } = await supabase
     .from("projects")
     .select("id, name, address")
     .eq("id", params.id)
@@ -23,7 +25,7 @@ export default async function ClientPortalPage({
     notFound();
   }
 
-  const { data: budgetLines } = await supabase
+  const { data: budgetLines, error: budgetError } = await supabase
     .from("budget_lines")
     .select("budgeted, actual")
     .eq("project_id", params.id);
@@ -37,7 +39,7 @@ export default async function ClientPortalPage({
     0
   );
 
-  const { data: punchItems } = await supabase
+  const { data: punchItems, error: punchError } = await supabase
     .from("punch_items")
     .select("status")
     .eq("project_id", params.id);
@@ -49,7 +51,7 @@ export default async function ClientPortalPage({
     (p: { status: string }) => p.status === "closed"
   ).length;
 
-  const { data: logs } = await supabase
+  const { data: logs, error: logsError } = await supabase
     .from("daily_logs")
     .select("id, notes, photo_url, created_at")
     .eq("project_id", params.id)
@@ -131,6 +133,19 @@ export default async function ClientPortalPage({
             )}
           </ul>
         )}
+      </section>
+
+      {/* TEMPORARY debug panel — remove once the sync issue is diagnosed */}
+      <section className="mt-12 bg-black/40 border border-white/20 rounded p-4 text-white/80 text-xs font-mono break-all">
+        <p>DEBUG — server rendered at: {new Date().toISOString()}</p>
+        <p>project id queried: {params.id}</p>
+        <p>budgetLines found: {budgetLines?.length ?? "null"}</p>
+        <p>punchItems found: {punchItems?.length ?? "null"}</p>
+        <p>logs found: {logs?.length ?? "null"}</p>
+        <p>projectError: {projectError ? JSON.stringify(projectError) : "none"}</p>
+        <p>budgetError: {budgetError ? JSON.stringify(budgetError) : "none"}</p>
+        <p>punchError: {punchError ? JSON.stringify(punchError) : "none"}</p>
+        <p>logsError: {logsError ? JSON.stringify(logsError) : "none"}</p>
       </section>
     </main>
   );
