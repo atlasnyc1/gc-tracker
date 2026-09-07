@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import { createServiceClient } from "@/lib/supabase/service";
 
+// Forces this page to fetch fresh data on every visit, so a client always
+// sees the latest budget, punch list, and daily logs instead of a cached
+// snapshot from an earlier visit.
+export const dynamic = "force-dynamic";
+
 export default async function ClientPortalPage({
   params,
 }: {
