@@ -34,12 +34,25 @@ export async function createProject(formData: FormData) {
   const contractValueRaw = formData.get("contract_value")?.toString().trim();
   const contract_value = contractValueRaw ? Number(contractValueRaw) : null;
 
-  await supabase.from("projects").insert({
-    company_id: companyId,
-    name,
-    address,
-    contract_value,
-  });
+  // Guards against an accidental double-submit (fast double-click, or
+  // pressing Enter) creating the same project twice.
+  const tenSecondsAgo = new Date(Date.now() - 10_000).toISOString();
+  const { data: recent } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("company_id", companyId)
+    .eq("name", name)
+    .gte("created_at", tenSecondsAgo)
+    .limit(1);
+
+  if (!recent || recent.length === 0) {
+    await supabase.from("projects").insert({
+      company_id: companyId,
+      name,
+      address,
+      contract_value,
+    });
+  }
 
   revalidatePath("/dashboard");
 }
