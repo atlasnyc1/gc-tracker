@@ -3,6 +3,31 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+// Guards against accidental double-submits (e.g. a fast double-click, or a
+// slow connection replaying a form) by checking whether an identical row
+// was just inserted a few seconds ago before inserting another one.
+async function wasJustSubmitted(
+  supabase: SupabaseClient,
+  table: string,
+  match: Record<string, string | number | null>
+) {
+  const tenSecondsAgo = new Date(Date.now() - 10_000).toISOString();
+
+  let query = supabase
+    .from(table)
+    .select("id")
+    .gte("created_at", tenSecondsAgo)
+    .limit(1);
+
+  for (const [key, value] of Object.entries(match)) {
+    query = query.eq(key, value as string | number);
+  }
+
+  const { data } = await query;
+  return !!data && data.length > 0;
+}
 
 export async function createDailyLog(formData: FormData) {
   const supabase = await createClient();
@@ -42,13 +67,22 @@ export async function createDailyLog(formData: FormData) {
     }
   }
 
-  await supabase.from("daily_logs").insert({
+  const isDuplicate = await wasJustSubmitted(supabase, "daily_logs", {
     project_id: projectId,
     notes,
     weather,
     crew_count,
-    photo_url,
   });
+
+  if (!isDuplicate) {
+    await supabase.from("daily_logs").insert({
+      project_id: projectId,
+      notes,
+      weather,
+      crew_count,
+      photo_url,
+    });
+  }
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
@@ -69,10 +103,17 @@ export async function createPunchItem(formData: FormData) {
 
   if (!projectId || !description) return;
 
-  await supabase.from("punch_items").insert({
+  const isDuplicate = await wasJustSubmitted(supabase, "punch_items", {
     project_id: projectId,
     description,
   });
+
+  if (!isDuplicate) {
+    await supabase.from("punch_items").insert({
+      project_id: projectId,
+      description,
+    });
+  }
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
@@ -143,11 +184,19 @@ export async function createBudgetLine(formData: FormData) {
 
   const budgeted = budgetedRaw ? Number(budgetedRaw) : 0;
 
-  await supabase.from("budget_lines").insert({
+  const isDuplicate = await wasJustSubmitted(supabase, "budget_lines", {
     project_id: projectId,
     cost_code: costCode,
     budgeted,
   });
+
+  if (!isDuplicate) {
+    await supabase.from("budget_lines").insert({
+      project_id: projectId,
+      cost_code: costCode,
+      budgeted,
+    });
+  }
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
@@ -172,18 +221,31 @@ export async function logSpend(formData: FormData) {
   const amount = Number(amountRaw);
   if (!amount) return;
 
+  // logSpend doesn't insert a new row (it updates a running total), so a
+  // double-submit here would double-count the spend amount instead of
+  // creating a visible duplicate row. Track recent spend "events" in a
+  // lightweight way by re-checking the line's updated_at as a proxy.
   const { data: line } = await supabase
     .from("budget_lines")
-    .select("actual")
+    .select("actual, updated_at")
     .eq("id", budgetLineId)
     .single();
 
   const currentActual = (line as { actual?: number } | null)?.actual ?? 0;
+  const updatedAt = (line as { updated_at?: string } | null)?.updated_at;
 
-  await supabase
-    .from("budget_lines")
-    .update({ actual: Number(currentActual) + amount })
-    .eq("id", budgetLineId);
+  const updatedVeryRecently =
+    updatedAt && Date.now() - new Date(updatedAt).getTime() < 3_000;
+
+  if (!updatedVeryRecently) {
+    await supabase
+      .from("budget_lines")
+      .update({
+        actual: Number(currentActual) + amount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", budgetLineId);
+  }
 
   revalidatePath(`/dashboard/projects/${projectId}`);
 }
