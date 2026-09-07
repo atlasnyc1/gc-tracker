@@ -41,8 +41,9 @@ export default async function ClientPortalPage({
 
   const { data: punchItems } = await supabase
     .from("punch_items")
-    .select("status")
-    .eq("project_id", params.id);
+    .select("id, description, status")
+    .eq("project_id", params.id)
+    .order("created_at", { ascending: false });
 
   const openCount = (punchItems ?? []).filter(
     (p: { status: string }) => p.status !== "closed"
@@ -92,9 +93,42 @@ export default async function ClientPortalPage({
         <h2 className="text-sm font-semibold text-ink/70 uppercase tracking-wide mb-3">
           Punch List
         </h2>
-        <p className="text-ink">
+        <p className="text-ink mb-4">
           {closedCount} fixed, {openCount} open
         </p>
+        {!punchItems || punchItems.length === 0 ? (
+          <p className="text-ink/50 text-sm">No punch items yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {punchItems.map(
+              (item: { id: string; description: string; status: string }) => (
+                <li
+                  key={item.id}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <span
+                    className={
+                      item.status === "closed"
+                        ? "text-ink/50 line-through text-sm"
+                        : "text-ink text-sm"
+                    }
+                  >
+                    {item.description}
+                  </span>
+                  <span
+                    className={
+                      item.status === "closed"
+                        ? "text-xs font-mono text-green-700 whitespace-nowrap"
+                        : "text-xs font-mono text-accent whitespace-nowrap"
+                    }
+                  >
+                    {item.status === "closed" ? "FIXED" : "OPEN"}
+                  </span>
+                </li>
+              )
+            )}
+          </ul>
+        )}
       </section>
 
       <section>
