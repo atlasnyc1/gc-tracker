@@ -86,6 +86,18 @@ export default function LoginPage() {
             : "Don't have an account? Sign up"}
         </button>
       </div>
+
+      <div className="mt-6 flex gap-4 text-sm text-white/50">
+        <a href="/faq" className="underline">
+          FAQ
+        </a>
+        <a href="/terms" className="underline">
+          Terms
+        </a>
+        <a href="/privacy" className="underline">
+          Privacy
+        </a>
+      </div>
     </main>
   );
 }
