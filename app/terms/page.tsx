@@ -153,10 +153,10 @@ export default function TermsPage() {
           <p className="text-sm text-ink/80">
             Questions about these Terms? Reach us at{" "}
             
-              href="mailto:njbuilder1@gmail.com"
+              href="mailto:info@amcmanagementcompany.com"
               className="text-accent underline"
             >
-              njbuilder1@gmail.com
+              info@amcmanagementcompany.com
             </a>
             .
           </p>
