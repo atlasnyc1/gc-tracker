@@ -33,6 +33,54 @@ export default async function DashboardPage() {
   const companyId =
     (profile as { company_id?: string } | null)?.company_id ?? "";
 
+  if (!isActive) {
+    return (
+      <main className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-8 gap-4">
+          <h1 className="text-2xl font-bold text-white">{companyName}</h1>
+          <form action="/auth/signout" method="post">
+            <button className="text-base underline text-white/70">
+              Sign out
+            </button>
+          </form>
+        </div>
+
+        <section className="bg-white border border-ink/10 rounded p-8 shadow-lg text-center">
+          <span className="block text-xs font-mono text-sky-500 uppercase tracking-wide mb-3">
+            Subscription required
+          </span>
+          <h2 className="text-xl font-semibold text-ink mb-2">
+            Subscribe to start using GC Tracker
+          </h2>
+          <p className="text-ink/60 text-sm mb-6">
+            $49/month gets you daily logs, a punch list, budget tracking, and
+            a shareable client link for every project.
+          </p>
+          <form action={startCheckout}>
+            <button
+              type="submit"
+              className="bg-accent text-white rounded px-6 py-3 text-base font-medium"
+            >
+              Subscribe now
+            </button>
+          </form>
+        </section>
+
+        <div className="mt-8 flex gap-4 text-sm text-white/50">
+          <Link href="/faq" className="underline">
+            FAQ
+          </Link>
+          <Link href="/terms" className="underline">
+            Terms
+          </Link>
+          <Link href="/privacy" className="underline">
+            Privacy
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   const { data: projects } = await supabase
     .from("projects")
     .select("id, name, address, contract_value, created_at")
@@ -45,18 +93,12 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold text-white">{companyName}</h1>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <span
-              className={
-                isActive
-                  ? "block text-xs font-mono text-emerald-400"
-                  : "block text-xs font-mono text-sky-300"
-              }
-            >
-              {isActive ? "ACTIVE" : "TRIALING"}
+            <span className="block text-xs font-mono text-emerald-400">
+              ACTIVE
             </span>
-            <form action={isActive ? openBillingPortal : startCheckout}>
+            <form action={openBillingPortal}>
               <button className="text-base underline text-white/70">
-                {isActive ? "Manage billing" : "Subscribe"}
+                Manage billing
               </button>
             </form>
           </div>
@@ -140,6 +182,18 @@ export default async function DashboardPage() {
           </ul>
         )}
       </section>
+
+      <div className="mt-10 flex gap-4 text-sm text-white/50">
+        <Link href="/faq" className="underline">
+          FAQ
+        </Link>
+        <Link href="/terms" className="underline">
+          Terms
+        </Link>
+        <Link href="/privacy" className="underline">
+          Privacy
+        </Link>
+      </div>
     </main>
   );
 }
