@@ -10,11 +10,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setResetSent(false);
     setLoading(true);
 
     const supabase = createClient();
@@ -33,6 +36,30 @@ export default function LoginPage() {
 
     router.push("/dashboard");
     router.refresh();
+  }
+
+  async function handleForgotPassword() {
+    setError("");
+    setResetSent(false);
+
+    if (!email) {
+      setError('Enter your email above first, then click "Forgot password?"');
+      return;
+    }
+
+    setResetLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    setResetSent(true);
   }
 
   return (
@@ -67,6 +94,11 @@ export default function LoginPage() {
           />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
+          {resetSent && (
+            <p className="text-sm text-green-700">
+              Check your email for a link to reset your password.
+            </p>
+          )}
 
           <button
             type="submit"
@@ -77,8 +109,22 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {mode === "signin" && (
+          <button
+            onClick={handleForgotPassword}
+            disabled={resetLoading}
+            className="w-full text-center text-sm text-ink/50 mt-3 underline disabled:opacity-50"
+          >
+            {resetLoading ? "Sending…" : "Forgot password?"}
+          </button>
+        )}
+
         <button
-          onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+          onClick={() => {
+            setMode(mode === "signup" ? "signin" : "signup");
+            setError("");
+            setResetSent(false);
+          }}
           className="w-full text-center text-base text-ink/60 mt-4 underline"
         >
           {mode === "signup"
