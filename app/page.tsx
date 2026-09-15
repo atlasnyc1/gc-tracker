@@ -20,6 +20,18 @@ export default function Home() {
       >
         Sign up / Sign in
       </Link>
+
+      <div className="mt-10 flex gap-4 text-sm text-white/50">
+        <Link href="/faq" className="underline">
+          FAQ
+        </Link>
+        <Link href="/terms" className="underline">
+          Terms
+        </Link>
+        <Link href="/privacy" className="underline">
+          Privacy
+        </Link>
+      </div>
     </main>
   );
 }
