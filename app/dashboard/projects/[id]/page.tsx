@@ -25,6 +25,22 @@ export default async function ProjectPage({
     redirect("/login");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("companies(subscription_status)")
+    .eq("id", user.id)
+    .single();
+
+  const company = (
+    profile as {
+      companies?: { subscription_status?: string } | null;
+    } | null
+  )?.companies;
+
+  if (company?.subscription_status !== "active") {
+    redirect("/dashboard");
+  }
+
   const { data: project } = await supabase
     .from("projects")
     .select("id, name, address, contract_value")
