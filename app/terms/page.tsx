@@ -152,7 +152,7 @@ export default function TermsPage() {
           <h2 className="font-semibold mb-2">13. Contact</h2>
           <p className="text-sm text-ink/80">
             Questions about these Terms? Reach us at{" "}
-            
+            <a
               href="mailto:info@amcmanagementcompany.com"
               className="text-accent underline"
             >
