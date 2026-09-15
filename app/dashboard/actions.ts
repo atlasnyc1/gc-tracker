@@ -19,13 +19,18 @@ export async function createProject(formData: FormData) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("company_id")
+    .select("company_id, companies(subscription_status)")
     .eq("id", user.id)
     .single();
 
   const companyId = (profile as { company_id?: string } | null)?.company_id;
+  const subscriptionStatus = (
+    profile as {
+      companies?: { subscription_status?: string } | null;
+    } | null
+  )?.companies?.subscription_status;
 
-  if (!companyId) return;
+  if (!companyId || subscriptionStatus !== "active") return;
 
   const name = formData.get("name")?.toString().trim();
   if (!name) return;
