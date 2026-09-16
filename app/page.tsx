@@ -21,6 +21,13 @@ export default function Home() {
         Sign up / Sign in
       </Link>
 
+      <Link
+        href="/portal/22222222-2222-4222-8222-222222222222"
+        className="mt-4 text-sm text-sky-300 underline"
+      >
+        See a live demo — no login needed
+      </Link>
+
       <div className="mt-10 flex gap-4 text-sm text-white/50">
         <Link href="/faq" className="underline">
           FAQ
