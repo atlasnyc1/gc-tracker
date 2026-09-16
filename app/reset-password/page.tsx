@@ -10,29 +10,67 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [linkFailed, setLinkFailed] = useState(false);
   const [done, setDone] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
 
     // Clicking the link in the reset email brings the visitor here with a
-    // special one-time code in the web address. Supabase reads that
-    // automatically and fires this event once it's turned into a real,
-    // temporary login just for setting a new password.
+    // one-time code in the web address (?code=...). We have to explicitly
+    // trade that code in for a real, temporary login before they can set a
+    // new password — it doesn't happen automatically.
+    async function init() {
+      const code = new URLSearchParams(window.location.search).get("code");
+
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (cancelled) return;
+        if (!error) {
+          setReady(true);
+          return;
+        }
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (data.session) {
+        setReady(true);
+      } else if (!code) {
+        // No code in the link and no existing session — this page was
+        // opened directly, not from a real reset email.
+        setLinkFailed(true);
+      }
+    }
+
+    init();
+
+    // Belt-and-suspenders for older-style links that do log the visitor in
+    // automatically and fire this event instead.
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setReady(true);
       }
     });
 
-    // Belt-and-suspenders: some browsers have the session ready before the
-    // listener above ever fires, so also check directly on load.
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
+    // Safety net: if nothing above worked within a few seconds, stop
+    // showing "Checking…" forever and tell the visitor what to do.
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        setReady((r) => {
+          if (!r) setLinkFailed(true);
+          return r;
+        });
+      }
+    }, 8000);
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      listener.subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   async function handleSubmit(e: FormEvent) {
@@ -88,7 +126,17 @@ export default function ResetPasswordPage() {
           Choose a new password for your account.
         </p>
 
-        {!ready ? (
+        {linkFailed ? (
+          <div className="text-center">
+            <p className="text-sm text-red-600 mb-4">
+              This reset link didn&apos;t work — it may have expired or
+              already been used.
+            </p>
+            <a href="/login" className="text-sm text-accent underline">
+              Request a new one
+            </a>
+          </div>
+        ) : !ready ? (
           <p className="text-sm text-ink/60 text-center">
             Checking your reset link…
           </p>
