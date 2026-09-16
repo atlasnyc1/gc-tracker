@@ -14,6 +14,28 @@ export default function Home() {
         you can send clients so they can check progress themselves — all
         in one place, nothing extra to learn.
       </p>
+
+      <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1541976590-713941681591?w=600&q=80"
+          alt="Construction site"
+          className="rounded-lg shadow-lg object-cover h-36 w-full"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80"
+          alt="Renovation work in progress"
+          className="rounded-lg shadow-lg object-cover h-36 w-full"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1503387837-b154d5074bd2?w=600&q=80"
+          alt="Reviewing project plans"
+          className="rounded-lg shadow-lg object-cover h-36 w-full"
+        />
+      </div>
+
       <Link
         href="/login"
         className="bg-accent text-white rounded px-6 py-3 text-base font-medium shadow-lg"
